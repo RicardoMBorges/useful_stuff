@@ -1,0 +1,29 @@
+import csv
+from pyteomics import mgf
+
+# Define the input MGF file and the output CSV file
+input_file = 'input.mgf'
+output_file = 'output.csv'
+
+# Define the threshold intensity percentage
+threshold = 50
+
+# Open the input MGF file and read the spectra
+with mgf.read(input_file) as spectra:
+    # Open the output CSV file and write the headers
+    with open(output_file, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['m/z', 'precursor_mz', 'charge'])
+
+        # Loop over each spectrum in the MGF file
+        for spectrum in spectra:
+            # Filter the peaks based on the intensity threshold
+            peaks = [peak for peak in spectrum['m/z array'] if spectrum['intensity array'][spectrum['m/z array'].index(peak)] >= (threshold / 100) * max(spectrum['intensity array'])]
+            
+            # Extract precursor m/z and charge state
+            precursor_mz = spectrum.get('params').get('pepmass')[0] if 'pepmass' in spectrum.get('params') else ''
+            charge = spectrum.get('params').get('charge')[0] if 'charge' in spectrum.get('params') else ''
+
+            # Write the m/z, precursor m/z, and charge values to the output CSV file
+            for peak in peaks:
+                writer.writerow([peak, precursor_mz, charge])
