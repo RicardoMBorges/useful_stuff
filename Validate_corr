@@ -1,0 +1,31 @@
+# Validation Correlations
+import matplotlib.pyplot as plt
+
+target_feature = 125
+
+df = MergeDF.iloc[[driverBioAct[0],target_feature]]
+
+# Sort the columns based on the values in the first row
+df_sorted = df.iloc[:, df.iloc[0].argsort()]
+
+# Scatter plot using the sorted rows
+plt.scatter(df_sorted.iloc[1], df_sorted.iloc[0])
+plt.xlabel('Target Vector')
+plt.ylabel('Driver BioAct Vector')
+plt.title(f"Scatter Plot of featur{driverBioAct} and BioAct")
+
+# Ignore points where the first row is 0
+non_zero_mask = df_sorted.iloc[0] != 0
+filtered_x = df_sorted.iloc[1][non_zero_mask]
+filtered_y = df_sorted.iloc[0][non_zero_mask]
+
+# Add a trendline (linear fit) to non-zero points
+coefficients = np.polyfit(filtered_x, filtered_y, 1)
+trendline = np.polyval(coefficients, filtered_x)
+plt.plot(filtered_x, trendline, color='red', label='Trendline')
+
+# Show the legend
+plt.legend()
+
+# Show the plot
+plt.show()
